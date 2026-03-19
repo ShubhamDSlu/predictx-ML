@@ -1,0 +1,117 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { background: #0a0a0f; min-height: 100vh; font-family: 'Syne', sans-serif; color: #e8e6ff; }
+
+#neuralCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.6; }
+
+.px-wrap { position: relative; min-height: 100vh; overflow: hidden; }
+
+.px-grid-bg {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background-image: linear-gradient(rgba(99,80,220,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(99,80,220,0.08) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+.px-glow {
+    position: absolute; width: 600px; height: 600px; border-radius: 50%; pointer-events: none; z-index: 0;
+    background: radial-gradient(circle, rgba(99,80,220,0.18) 0%, transparent 70%);
+    top: -150px; left: 50%; transform: translateX(-50%);
+}
+
+.px-inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; padding: 3rem 1.5rem 2.5rem; }
+
+.px-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(99,80,220,0.15); border: 0.5px solid rgba(99,80,220,0.45);
+    border-radius: 999px; padding: 5px 16px; font-size: 11px;
+    font-family: 'JetBrains Mono', monospace; color: #a89fff; letter-spacing: 0.1em; margin-bottom: 1.2rem;
+}
+.px-badge::before {
+    content: ''; width: 7px; height: 7px; border-radius: 50%;
+    background: #7c5cfc; animation: blink 1.8s ease-in-out infinite; flex-shrink: 0;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+.px-title { font-size: clamp(38px,8vw,52px); font-weight: 800; line-height: 1.05; letter-spacing: -0.025em; color: #fff; margin-bottom: 0.4rem; }
+.px-title span {
+    background: linear-gradient(135deg, #a89fff 0%, #7c5cfc 50%, #c471ed 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+.px-subtitle { font-size: 13px; color: #4e4a6a; font-family: 'JetBrains Mono', monospace; margin-bottom: 2.5rem; }
+
+.px-card { background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.09); border-radius: 20px; padding: 2rem; }
+
+.px-section-label {
+    display: flex; align-items: center; gap: 10px; font-size: 10px;
+    font-family: 'JetBrains Mono', monospace; color: #4e4a6a;
+    letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 1.4rem;
+}
+.px-section-label::after { content: ''; flex: 1; height: 0.5px; background: rgba(255,255,255,0.07); }
+
+.px-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.px-field { display: flex; flex-direction: column; gap: 6px; }
+.px-field label { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #4e4a6a; letter-spacing: 0.1em; }
+
+.px-field input,
+.px-field select {
+    background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.09);
+    border-radius: 10px; padding: 10px 14px; font-size: 14px;
+    font-family: 'JetBrains Mono', monospace; color: #e8e6ff;
+    outline: none; width: 100%; transition: border-color 0.2s, background 0.2s;
+}
+
+.px-field input { -moz-appearance: textfield; appearance: textfield; }
+.px-field input::-webkit-outer-spin-button,
+.px-field input::-webkit-inner-spin-button { opacity: 0.25; }
+.px-field input::placeholder { color: #2e2c46; }
+
+.px-field select {
+    cursor: pointer; appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234e4a6a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+}
+.px-field select option { background: #1a1a2e; color: #e8e6ff; }
+
+.px-field input:focus,
+.px-field select:focus { border-color: rgba(99,80,220,0.55); background-color: rgba(99,80,220,0.06); }
+
+.px-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; margin-top: 1.5rem; padding: 14px; border-radius: 12px;
+    background: linear-gradient(135deg, #7c5cfc 0%, #c471ed 100%);
+    border: none; color: #fff; font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 700; letter-spacing: 0.03em;
+    cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+}
+.px-btn:hover  { opacity: 0.88; }
+.px-btn:active { transform: scale(0.98); }
+.px-btn.loading { pointer-events: none; opacity: 0.65; }
+
+.spinner {
+    display: inline-block; width: 14px; height: 14px; flex-shrink: 0;
+    border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.px-error { font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #f09595; margin-top: 10px; display: none; }
+.px-error.visible { display: block; }
+
+.px-result-area { margin-top: 1.6rem; border-top: 0.5px solid rgba(255,255,255,0.07); padding-top: 1.4rem; display: none; }
+.px-result-area.visible { display: block; }
+.px-result-label { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: #4e4a6a; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.4rem; }
+.px-result-value { font-size: 38px; font-weight: 800; font-family: 'JetBrains Mono', monospace; line-height: 1.1; background: linear-gradient(135deg,#a89fff,#7c5cfc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.px-result-status { font-size: 12px; color: #4e4a6a; font-family: 'JetBrains Mono', monospace; margin-top: 6px; }
+.px-result-bar { height: 3px; border-radius: 99px; background: rgba(255,255,255,0.05); margin-top: 1.1rem; overflow: hidden; }
+.px-result-bar-fill { height: 100%; border-radius: 99px; width: 0%; background: linear-gradient(90deg,#7c5cfc,#c471ed); transition: width 1.2s cubic-bezier(0.22,1,0.36,1); }
+
+.px-footer { text-align: center; margin-top: 2rem; font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #2e2c46; }
+.px-footer span { color: #4e4a6a; }
+
+@media (max-width: 480px) {
+    .px-card  { padding: 1.4rem 1.2rem; }
+    .px-grid  { grid-template-columns: 1fr; }
+    .px-title { font-size: 38px; }
+}
