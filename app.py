@@ -70,14 +70,3 @@ def predict():
 
 if __name__ == "__main__":
     app.run(debug=True)
-```
-
-**`requirements.txt`:**
-```
-flask>=3.0.0
-numpy>=1.24.0
-scikit-learn>=1.3.0
-joblib>=1.3.0
-gdown>=4.7.1
-gunicorn
-requests
