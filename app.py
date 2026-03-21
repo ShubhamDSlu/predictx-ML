@@ -2,22 +2,34 @@ from flask import Flask, render_template, request, jsonify
 import numpy as np
 import joblib
 import os
+import gdown
 
 print("🚀 PredictX App Starting...")
 
 app = Flask(__name__)
 
 # ==============================
-# MODEL LOAD (SIMPLE & STABLE)
+# MODEL DOWNLOAD + LOAD (FINAL FIX)
 # ==============================
 
 MODEL_PATH = "rf_pipeline_model.pkl"
+FILE_ID = "10Z55J4uQgWKlcHdmBlnZEEJTs4FJFx2r"
 
 model = None
 
 try:
+    # Step 1: Download if not exists
+    if not os.path.exists(MODEL_PATH):
+        print("📥 Downloading model from Google Drive...")
+
+        gdown.download(id=FILE_ID, output=MODEL_PATH, quiet=False)
+
+        print("✅ Model downloaded")
+
+    # Step 2: Load model
     model = joblib.load(MODEL_PATH)
     print("✅ Model loaded successfully")
+
 except Exception as e:
     print("❌ Model loading failed:", e)
 
