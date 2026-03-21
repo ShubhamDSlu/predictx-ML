@@ -4,48 +4,40 @@ import joblib
 import os
 import requests
 
-print("🔥 PredictX App Starting...")
+print("PredictX App Starting...")
 
 app = Flask(__name__)
 
-# ==============================
-# MODEL DOWNLOAD (IMPORTANT)
-# ==============================
-MODEL_URL = os.getenv("MODEL_URL")
-
+MODEL_URL  = os.getenv("MODEL_URL")
 MODEL_PATH = "rf_pipeline_model.pkl"
 
-if not os.path.exists(MODEL_PATH):
-    print("⬇️ Downloading model from cloud...")
+if not os.path.exists(MODEL_PATH) and MODEL_URL:
+    print("Downloading model from cloud...")
     try:
-        r = requests.get(MODEL_URL)
+        r = requests.get(MODEL_URL, timeout=30)
         with open(MODEL_PATH, "wb") as f:
             f.write(r.content)
-        print("✅ Model downloaded successfully")
+        print("Model downloaded successfully")
     except Exception as e:
-        print("❌ Model download failed:", e)
+        print("Model download failed:", e)
 
-# ==============================
-# LOAD MODEL
-# ==============================
+model = None
 try:
     model = joblib.load(MODEL_PATH)
-    print("✅ Model loaded successfully")
+    print("Model loaded successfully")
 except Exception as e:
-    print("❌ Model loading failed:", e)
-
-# ==============================
-# ROUTES
-# ==============================
+    print("Model loading failed:", e)
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
-
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
+        if model is None:
+            return jsonify({"error": "Model not loaded"}), 500
+
         data = request.get_json()
 
         features = []
@@ -56,9 +48,8 @@ def predict():
             features.append(float(data[key]))
 
         X = np.array(features).reshape(1, -1)
-
-        prediction = model.predict(X)
-        output = round(float(prediction[0]), 4)
+        pred = model.predict(X)[0]
+        output = round(float(pred), 4)
 
         return jsonify({
             "prediction": output,
@@ -67,7 +58,6 @@ def predict():
 
     except Exception as e:
         return jsonify({"error": str(e)})
-
 
 if __name__ == "__main__":
     app.run(debug=True)
