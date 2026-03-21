@@ -8,27 +8,25 @@ print("PredictX App Starting...")
 app = Flask(__name__)
 
 MODEL_PATH = "rf_pipeline_model.pkl"
-MODEL_URL  = os.getenv("MODEL_URL")
 
+# Always train fresh on Render
 if not os.path.exists(MODEL_PATH):
-    print("Downloading model from Google Drive...")
+    print("Training model...")
     try:
-        import gdown
-        gdown.download(MODEL_URL, MODEL_PATH, quiet=False, fuzzy=True)
-        print("Model downloaded successfully")
+        from sklearn.datasets import fetch_california_housing
+        from sklearn.ensemble import RandomForestRegressor
+        from sklearn.model_selection import train_test_split
+
+        data = fetch_california_housing()
+        X, y = data.data, data.target
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42)
+        m = RandomForestRegressor(n_estimators=100, random_state=42)
+        m.fit(X_train, y_train)
+        joblib.dump(m, MODEL_PATH)
+        print("Model trained and saved!")
     except Exception as e:
-        print("gdown failed:", e)
-        try:
-            import requests
-            url = MODEL_URL + "&confirm=t"
-            r = requests.get(url, stream=True, timeout=120)
-            with open(MODEL_PATH, "wb") as f:
-                for chunk in r.iter_content(chunk_size=32768):
-                    if chunk:
-                        f.write(chunk)
-            print("Model downloaded via requests")
-        except Exception as e2:
-            print("Download failed:", e2)
+        print("Training failed:", e)
 
 model = None
 try:
@@ -70,3 +68,12 @@ def predict():
 
 if __name__ == "__main__":
     app.run(debug=True)
+```
+
+**`requirements.txt`:**
+```
+flask>=3.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+joblib>=1.3.0
+gunicorn
